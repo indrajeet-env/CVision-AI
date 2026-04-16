@@ -1,0 +1,1 @@
+For Token Blacklisting, using Redis is the best practice, since it has better throughput, in real world scenerios, but for now in this prj, i am using our mongodb database only
