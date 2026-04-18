@@ -1,7 +1,12 @@
-
 const express = require('express');
 const cookieParser = require('cookie-parser')
 const app = express();
+const cors = require('cors')
+
+app.use(cors({
+  origin: 'http://localhost:5173', // Allow requests from this origin
+  credentials: true, // Allow cookies to be sent with requests
+}));
 
 app.use(express.json()); // A middleware that tells Express.js, Whenever a request comes in, parse JSON body first before it reaches my routes.
 app.use(cookieParser())
