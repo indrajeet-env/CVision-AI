@@ -5,17 +5,36 @@ const interviewReportModel = require("../models/interviewReport.model");
 
 async function generateInterviewReportController(req, res) {
   try {
-    if (!req.file) {
-      return res.status(400).json({ message: "Resume file is required" });
+    const { selfDescription, jobDescription } = req.body;
+    
+    // Validate required fields
+    if (!jobDescription || jobDescription.trim().length === 0) {
+      return res.status(400).json({ message: "Job description is required" });
     }
 
-    const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText();
-    const { selfDescription, jobDescription } = req.body;
+    // Resume and selfDescription validation
+    let resumeContent = "";
+    
+    if (req.file) {
+      if (req.file.mimetype !== 'application/pdf') {
+        return res.status(400).json({ message: "Only PDF files are supported" });
+      }
+
+      try {
+        const pdfData = await pdfParse(req.file.buffer);
+        resumeContent = pdfData.text;
+      } catch (pdfError) {
+        console.error("PDF Parsing Error:", pdfError);
+        return res.status(400).json({ message: "Failed to parse PDF file" });
+      }
+    } else if (!selfDescription || selfDescription.trim().length === 0) {
+      return res.status(400).json({ message: "Either resume file or self-description is required" });
+    }
 
     // 1. Call AI
     const aiRawResponse = await generateInterviewReport({
-      resume: resumeContent.text,
-      selfDescription,
+      resume: resumeContent,
+      selfDescription: selfDescription || "",
       jobDescription
     });
 
@@ -24,10 +43,10 @@ async function generateInterviewReportController(req, res) {
 
     // 3. Save safely
     const interviewReport = await interviewReportModel.create({
-      user: req.user.id,
-      resume: resumeContent.text,
+      user: req.user?.id || null,
+      resume: resumeContent,
       jobDescription,
-      selfDescription,
+      selfDescription: selfDescription || "",
       ...cleanedData
     });
 
@@ -46,6 +65,60 @@ async function generateInterviewReportController(req, res) {
   }
 }
 
+async function getInterviewReportByIdController(req, res) {
+  try {
+    const { interviewId } = req.params;
+
+    const interviewReport = await interviewReportModel.findOne({
+      _id: interviewId,
+      user: req.user?.id || null
+    });
+
+    if (!interviewReport) {
+      return res.status(404).json({ message: "Interview report not found" });
+    }
+
+    return res.status(200).json({
+      message: "Interview report fetched successfully",
+      data: interviewReport
+    });
+  } catch (error) {
+    console.error("Get Report Error:", error);
+    return res.status(500).json({
+      message: "Failed to fetch report",
+      error: error.message
+    });
+  }
+}
+
+async function getAllUserInterviewReportsController(req, res){
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(200).json({
+        message: "Unauthenticated users have no saved reports",
+        data: []
+      });
+    }
+
+    const interviewReports = await interviewReportModel.find({
+      user: req.user.id
+    }).sort({ createdAt: -1 }).select("-resume -selfDescription -jobDescription -__v");
+
+    return res.status(200).json({
+      message: "User interview reports fetched successfully",
+      data: interviewReports
+    });
+  } catch (error) {
+    console.error("Get All Reports Error:", error);
+    return res.status(500).json({
+      message: "Failed to fetch reports",
+      error: error.message
+    });
+  }
+}
+
 module.exports = {
-  generateInterviewReportController
+  generateInterviewReportController,
+  getInterviewReportByIdController,
+  getAllUserInterviewReportsController
 };

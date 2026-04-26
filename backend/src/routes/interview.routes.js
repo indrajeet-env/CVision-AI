@@ -7,12 +7,24 @@ const fileMiddleware = require('../middleware/file.middleware');
 const interviewRouter = express.Router();
 
 /**
- * @route POST /api/interview/
+ * @route POST /api/interview
  * @description Generate interview report for a candidate based on their resume, job description and self description using AI
- * @access private (we can add authentication middleware and make it accessible only to logged in users)
+ * @access public (no authentication required for now)
  */
+interviewRouter.post("/", fileMiddleware.upload.single('resume'), authMiddleware.optionalAuthUser, interviewReportController.generateInterviewReportController)
 
-interviewRouter.post("/", authMiddleware.authUser, fileMiddleware.upload.single('resume'), interviewReportController.generateInterviewReportController)
+/**
+ * @GET /api/interview/report/:interviewId
+ * @description Get interview report by interviewID
+ * @access public
+ */
+interviewRouter.get("/report/:interviewId", authMiddleware.optionalAuthUser, interviewReportController.getInterviewReportByIdController)
 
+/**
+ * @GET /api/interview
+ * @description Get all interview reports for the logged in user (or all if not logged in)
+ * @access public
+ */
+interviewRouter.get("/", authMiddleware.optionalAuthUser, interviewReportController.getAllUserInterviewReportsController)
 
 module.exports = interviewRouter
