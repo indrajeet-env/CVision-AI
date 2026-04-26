@@ -1,21 +1,46 @@
 @use "./style/button.scss";
 
+:root {
+  --bg-color: #1a1b26;
+  --bg-light: #24283b;
+  --border-color: #414868;
+  --accent-color: #7aa2f7;
+  --accent-hover: #bb9af7;
+  --text-primary: #c0caf5;
+  --text-secondary: #9aa5ce;
+  --error-color: #f7768e;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-html
-// Base
+html {
+  background-color: var(--bg-color);
+  overscroll-behavior: none;
+}
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  overscroll-behavior: none;
+  overflow-x: hidden;
 }
 
 #root {
   display: flex;
   width: 100%;
   min-height: 100vh;
-  background-color: #141414;
-  color: whitesmoke;
+  background-color: var(--bg-color);
 }
+
+/* ─────────────────────────────────────────────────────── */
+/* Responsive Breakpoints */
+/* ─────────────────────────────────────────────────────── */
+
+/* Mobile: 320px - 640px */
+/* Tablet: 641px - 1024px */
+/* Desktop: 1025px+ */

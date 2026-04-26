@@ -6,14 +6,34 @@
   border-radius: 0.75rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  font-size: 1rem;
+  width: 100%;
+
+  @media (max-width: 640px) {
+    padding-inline: 1rem;
+    padding-block: 0.65rem;
+    font-size: 0.95rem;
+  }
 
   &.primary-button{
-    background-color: #ff2732;
+    background-color: #7aa2f7;
     color: whitesmoke;
+    box-shadow: 0 4px 12px rgba(122, 162, 247, 0.3);
+
+    &:hover {
+      background-color: #5a8dd8;
+      box-shadow: 0 6px 20px rgba(122, 162, 247, 0.5);
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      background-color: #4a7db0;
+      transform: scale(0.98) translateY(0);
+      box-shadow: 0 2px 8px rgba(122, 162, 247, 0.3);
+    }
   }
 
   &:active {
-    background-color: #ff2732;
     transform: scale(0.98);
   }
 }

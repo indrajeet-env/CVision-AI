@@ -9,13 +9,20 @@ const Register = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
 
   const {loading, handleRegister} = useAuth(); // useAuth hook se loading state aur handleRegister function ko access karenge
 
   const handleSubmit = async(e) => {
     e.preventDefault();
-    await handleRegister({username, email, password}); // handleRegister function ko call karenge jab form submit hoga, isme username, email aur password pass karenge
-    navigate('/') // Registration successful hone ke baad home page pe redirect kar denge
+    setAuthError('');
+
+    const result = await handleRegister({username, email, password}); // handleRegister function ko call karenge jab form submit hoga, isme username, email aur password pass karenge
+    if (result.success) {
+      navigate('/'); // Registration successful hone ke baad home page pe redirect kar denge
+    } else{
+      setAuthError(result.message || 'Registration failed. Please try again.');
+    }
   }
 
   if(loading){
@@ -29,25 +36,35 @@ const Register = () => {
     <main>
       <div className="form-container">
         <h1>Register</h1>
+        {authError && <p className="auth-error">{authError}</p>}
 
         <form onSubmit={handleSubmit}> 
           {/* // Register asks for name, email and password */}
           <div className="input-group">
             <label htmlFor="username">User Name</label>
             <input 
-              onChange={(e) => {setUsername(e.target.value)}}
+              onChange={(e) => {
+                setUsername(e.target.value);
+                if (authError) setAuthError('');
+              }}
               type="text" id="username" name="username" placeholder="Enter username" required />
           </div>
           <div className="input-group">
             <label htmlFor="email">Email</label>
             <input
-              onChange={(e) => {setEmail(e.target.value)}}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (authError) setAuthError('');
+              }}
               type="email" id="email" name="email" placeholder="Enter your email" required />
           </div>  
           <div className="input-group">
             <label htmlFor="password">Password</label>
             <input 
-              onChange={(e) => {setPassword(e.target.value)}}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (authError) setAuthError('');
+              }}
               type="password" id="password" name="password" placeholder="Enter your password" required />
             </div>
 
