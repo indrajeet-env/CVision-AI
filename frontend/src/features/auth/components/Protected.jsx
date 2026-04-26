@@ -7,11 +7,11 @@
 // Even if they are not logged in ❌
 
 import {useAuth} from "../hooks/useAuth.js";
-import React, { useEffect } from 'react'
-import {Navigate} from "react-router";
+import React, { Children, useEffect } from 'react'
+import {Navigate} from "react-router-dom";
 
 
-const Protected = () => {
+const Protected = ({children}) => {
   const {loading, user} = useAuth();
 
   if(loading){
@@ -27,11 +27,7 @@ const Protected = () => {
     }
 
 
-  return (
-    <main>
-
-    </main>
-  )
-}
+  return children;
+};
 
 export default Protected
