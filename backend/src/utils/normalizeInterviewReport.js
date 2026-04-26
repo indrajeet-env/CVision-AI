@@ -48,6 +48,14 @@ function normalizeQuestions(arr) {
       };
     }
 
+    if (!q || typeof q !== "object") {
+      return {
+        question: `Question ${index + 1}`,
+        intention: "Understand candidate thinking",
+        answer: "Explain clearly with examples"
+      };
+    }
+
     return {
       question: cleanString(q.question || `Question ${index + 1}`),
       intention: cleanString(q.intention || "Understand candidate thinking"),
@@ -68,6 +76,13 @@ function normalizeSkillGap(arr) {
       };
     }
 
+    if (!s || typeof s !== "object") {
+      return {
+        skills: "Unknown Skill",
+        severity: "Low"
+      };
+    }
+
     return {
       skills: cleanString(s.skills || "Unknown Skill"),
       severity: normalizeSeverity(s.severity)
@@ -80,6 +95,14 @@ function normalizePreparationPlan(arr) {
   arr = ensureArray(arr);
 
   return arr.map((p, index) => {
+    if (!p || typeof p !== "object") {
+      return {
+        day: index + 1,
+        focus: "General Preparation",
+        tasks: []
+      };
+    }
+
     return {
       day: Number(p.day) || index + 1,
       focus: cleanString(p.focus || "General Preparation"),
@@ -94,10 +117,14 @@ function normalizeMatchScore(score) {
 
   if (isNaN(num)) return 50;
 
+  if (num <= 1 && num > 0) {
+    num = num * 100;
+  }
+
   if (num < 0) return 0;
   if (num > 100) return 100;
 
-  return num;
+  return Math.round(num);
 }
 
 // MAIN FUNCTION

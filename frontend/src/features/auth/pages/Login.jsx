@@ -11,11 +11,18 @@ const Login = () => {
 
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
+  const [authError, setAuthError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await handleLogin({email, password});
-    navigate('/'); // Login successful hone ke baad home page pe redirect kar denge
+    setAuthError("");
+
+    const result = await handleLogin({email, password});
+    if (result.success) {
+      navigate('/'); // Login successful hone ke baad home page pe redirect kar denge
+    } else{
+      setAuthError(result.message || "Login failed. Please check your credentials.");
+    }
   }
 
   if(loading){
@@ -30,19 +37,26 @@ const Login = () => {
     <main>
       <div className="form-container">
         <h1>Login</h1>
+        {authError && <p className="auth-error">{authError}</p>}
 
         <form onSubmit={handleSubmit}>
           {/* // Login asks for email and password */}
           <div className="input-group">
             <label htmlFor="email">Email</label>
             <input 
-              onChange={(e) => {setemail(e.target.value)}}
+              onChange={(e) => {
+                setemail(e.target.value);
+                if (authError) setAuthError("");
+              }}
               type="email" id="email" name="email" placeholder="Enter your email" required />
           </div>
           <div className="input-group">
             <label htmlFor="password">Password</label>
             <input
-             onChange={(e) => {setpassword(e.target.value)}}
+             onChange={(e) => {
+              setpassword(e.target.value);
+              if (authError) setAuthError("");
+             }}
              type="password" id="password" name="password" placeholder="Enter your password" required />
           </div>
           <button type="submit" className='button primary-button' >Login</button>
