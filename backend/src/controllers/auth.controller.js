@@ -3,6 +3,15 @@ const bcrypt = require('bcryptjs'); // A library to hash passwords and compare h
 const jwt = require('jsonwebtoken'); // A library to generate and verify JSON Web Tokens (JWTs)
 const tokenBlackListModel = require('../models/blacklist.model');
 
+function getCookieOptions() {
+  const isProd = process.env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? "none" : "lax",
+  };
+}
+
 
 /**
  * @route registerUserController
@@ -60,11 +69,7 @@ async function registerUserController(req, res){
     );
 
     // Set the token in a cookie
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use secure cookies only in production (HTTPS); keep false in development so cookies work on localhost
-      sameSite: "strict",
-    });
+    res.cookie('token', token, getCookieOptions());
 
     res.status(201).json({
       message: 'User registered successfully',
@@ -117,11 +122,7 @@ async function loginUserController(req, res){
       { expiresIn: "1d" },
     )
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use secure cookies only in production (HTTPS); keep false in development so cookies work on localhost
-      sameSite: "strict",
-    });
+    res.cookie('token', token, getCookieOptions());
 
     res.status(200).json({
       message: "User Logged in successfully",
@@ -168,11 +169,7 @@ async function logoutUserController(req, res){
 
     await tokenBlackListModel.create({token, expiresAt}); // Add the token to the blacklist with its expiration time
 
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use secure cookies only in production (HTTPS); keep false in development so cookies work on localhost
-      sameSite: "strict",
-    })
+    res.clearCookie("token", getCookieOptions())
 
     return res.status(200).json({
       message: "User Logged Out successfully",

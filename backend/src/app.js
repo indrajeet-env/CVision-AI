@@ -3,8 +3,13 @@ const cookieParser = require('cookie-parser')
 const app = express();
 const cors = require('cors')
 
+const allowedOrigins = (process.env.FRONTEND_URL || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: 'http://localhost:5173', // Allow requests from this origin
+  origin: allowedOrigins, // Allow requests from configured frontend origin(s)
   credentials: true, // Allow cookies to be sent with requests
 }));
 
