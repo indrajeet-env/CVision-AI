@@ -30,4 +30,24 @@ async function authUser(req, res, next){
   }
 }
 
-module.exports = {authUser};
+async function optionalAuthUser(req, res, next) {
+  const token = req.cookies.token;
+  if (!token) {
+    return next();
+  }
+
+  const isTokenBlacklisted = await tokenBlackListModel.findOne({token});
+  if (isTokenBlacklisted) {
+    return next();
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = decoded;
+  } catch (err) {
+    // If token is invalid, just proceed without setting req.user
+  }
+  next();
+}
+
+module.exports = { authUser, optionalAuthUser };
