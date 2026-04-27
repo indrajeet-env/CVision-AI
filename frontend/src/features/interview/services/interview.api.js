@@ -5,8 +5,11 @@
 
 import axios from 'axios';
 
+const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3069';
+const normalizedApiUrl = rawApiUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3069/api',
+  baseURL: normalizedApiUrl,
   withCredentials: true, // Include cookies for authentication
 });
 
@@ -23,7 +26,7 @@ export const generateInterviewReport = async ({ resumeFile, jobDescription, self
   }
   formData.append("jobDescription", jobDescription);
   formData.append("selfDescription", selfDescription);
-  return api.post('/interview', formData, {
+  return api.post('/api/interview', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -36,7 +39,7 @@ export const generateInterviewReport = async ({ resumeFile, jobDescription, self
  * @returns {Promise<Object>} Interview report data
  */
 export const getInterviewReportById = (reportId) => {
-  return api.get(`/interview/report/${reportId}`)
+  return api.get(`/api/interview/report/${reportId}`)
     .then(response => response.data);
 };
 
@@ -45,7 +48,7 @@ export const getInterviewReportById = (reportId) => {
  * @returns {Promise<Array>} Array of interview reports
  */
 export const getAllInterviewReports = () => {
-  return api.get('/interview')
+  return api.get('/api/interview')
     .then(response => response.data);
 };
 
@@ -55,7 +58,7 @@ export const getAllInterviewReports = () => {
  */
 export const downloadResumePdf = async (reportId) => {
   try {
-    const response = await api.get(`/interview/${reportId}/resume`, {
+    const response = await api.get(`/api/interview/resume/pdf/${reportId}`, {
       responseType: 'blob',
     });
 
