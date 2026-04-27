@@ -1,8 +1,12 @@
 // Frontend ko backend se communicate jo package ki need padti hai is axios, so we'll install and import it here. Axios is a promise-based HTTP client for the browser and Node.js, which allows us to make HTTP requests to our backend API easily.'
 
 import axios from 'axios';
+
+const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3069';
+const normalizedApiUrl = rawApiUrl.replace(/\/+$/, '').replace(/\/api$/, '');
+
 const api = axios.create({
-  baseURL: 'http://localhost:3069',
+  baseURL: normalizedApiUrl,
   withCredentials: true
 })
 
