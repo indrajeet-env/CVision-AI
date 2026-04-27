@@ -1,6 +1,5 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const { mod } = require("three/tsl");
 
 async function connectDB(){
   try{
