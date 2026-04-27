@@ -1,4 +1,5 @@
 const pdfParse = require('pdf-parse');
+const mongoose = require("mongoose");
 const {generateInterviewReport, generateResumePdf} = require("../services/ai.service");
 const normalizeInterviewReport = require("../utils/normalizeInterviewReport");
 const interviewReportModel = require("../models/interviewReport.model");
@@ -118,18 +119,24 @@ async function getAllUserInterviewReportsController(req, res){
 }
 
 async function generateResumePdfController(req, res){
-  const { interviewReportId } = req.params;
-
-  const interviewReport = await interviewReportModel.findById(interviewReportId);
-
-  if(!interviewReport){
-    return res.status(404).json({
-      message: "Interview report not found"
-    })
-  }
-  const { resume, selfDescription, jobDescription } = interviewReport;
-
   try{
+    const { interviewReportId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(interviewReportId)) {
+      return res.status(400).json({
+        message: "Invalid interview report id",
+      });
+    }
+
+    const interviewReport = await interviewReportModel.findById(interviewReportId);
+
+    if(!interviewReport){
+      return res.status(404).json({
+        message: "Interview report not found"
+      })
+    }
+    const { resume, selfDescription, jobDescription } = interviewReport;
+
     const pdfBuffer = await generateResumePdf({ resume, selfDescription, jobDescription });
 
     res.set({
